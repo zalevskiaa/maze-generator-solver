@@ -29,7 +29,9 @@ def distance_to_wall(img, r, c, max_distance):
         return 0
 
     for dist in range(1, max_distance):
-        if not np.all(img[r-dist:r+dist+1, c-dist:c+dist+1] == (255, 255, 255)):
+        if not np.all(
+            img[r-dist:r+dist+1, c-dist:c+dist+1] == (255, 255, 255)
+        ):
             return dist
 
     return max_distance
@@ -53,6 +55,7 @@ def wall_loss(img):
     """returns matrix of sums (bool(img) * kernel)"""
     pass
 
+
 def find_and_draw_maze_path(img, max_distance_to_wall):
     # r, c
     start = 5, 5
@@ -64,18 +67,18 @@ def find_and_draw_maze_path(img, max_distance_to_wall):
     visited = np.zeros(img.shape[:2])
     visited[start[0], start[1]] = 1
     previous = np.zeros((*img.shape[:2], 2), dtype=np.int64)
-    
+
     while heap:
         dist, r, c = heapq.heappop(heap)
         assert np.all(img[r, c, :] == (255, 255, 255))
-        
+
         if (r, c) == finish:
             break
 
         # for dr, dc in zip([0, 0, -1, 1], [-1, 1, 0, 0]):
-        for dr, dc in zip([1, 1, 0, -1, -1, -1, 0, 1], 
+        for dr, dc in zip([1, 1, 0, -1, -1, -1, 0, 1],
                           [0, -1, -1, -1, 0, 1, 1, 1]):
-        
+
             nr, nc = r + dr, c + dc
 
             if not np.all(img[nr, nc, :] == (255, 255, 255)):
@@ -83,9 +86,11 @@ def find_and_draw_maze_path(img, max_distance_to_wall):
 
             if visited[nr, nc]:
                 continue
-            
+
             k = 3
-            wall_loss = k * (max_distance_to_wall - distance_to_wall(img, r, c, max_distance_to_wall))
+            wall_loss = k * (max_distance_to_wall - distance_to_wall(
+                img, r, c, max_distance_to_wall
+            ))
             diag_loss = 3 * (dr != 0 and dc != 0)
 
             nd = dist + 1 + wall_loss + diag_loss
@@ -99,7 +104,9 @@ def find_and_draw_maze_path(img, max_distance_to_wall):
 
     while (r, c) != start:
         x, y = c, r
-        img = cv2.circle(img, (x, y), radius=0, color=(0, 0, 255), thickness=-1)
+        img = cv2.circle(img, (x, y), radius=0,
+                         color=(0, 0, 255),
+                         thickness=-1)
         r, c = previous[r, c]
 
     return img
@@ -125,6 +132,6 @@ def main():
 if __name__ == '__main__':
     import sys
     sys. setrecursionlimit(10 ** 5)
-    
+
     # debug()
     main()
